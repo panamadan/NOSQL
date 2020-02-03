@@ -1,9 +1,10 @@
-module.exports = function(app){
+// var db = require("../models");
+const mongojs = require("mongojs");
 
+module.exports = function(app,db){
 
-
-  app.get("/api/workouts/range", (req, res) => {
-    db.notes.find({}, (error, data) => {
+ app.get("/api/workouts/range", (req, res) => {
+    db.workouts.find({}, (error, data) => {
       if (error) {
         res.send(error);
       } else {
@@ -13,7 +14,7 @@ module.exports = function(app){
   });
   
   app.get("/workout", (req, res) => {
-    db.notes.findOne(
+    db.workouts.findOne(
       {
         _id: mongojs.ObjectId(req.params.id)
       },
@@ -27,7 +28,30 @@ module.exports = function(app){
     );
   });
   app.post("/update/:id", (req, res) => {
-    db.notes.create(
+    db.workouts.create(
+      {
+        _id: mongojs.ObjectId(req.params.id)
+      },
+      {
+        $set: {
+          title: req.body.title,
+          note: req.body.note,
+          modified: Date.now()
+        }
+      },
+      (error, data) => {
+        if (error) {
+          res.send(error);
+        } else {
+          res.send(data);
+        }
+      }
+    );
+  });
+  app.put("/api/workouts/:id", (req, res) => {
+      console.log(req.body);
+      
+    db.workouts.update(
       {
         _id: mongojs.ObjectId(req.params.id)
       },
@@ -48,24 +72,29 @@ module.exports = function(app){
     );
   });
   app.post("/api/workouts", (req, res) => {
-    db.notes.update(
-      {
-        _id: mongojs.ObjectId(req.params.id)
-      },
-      {
-        $set: {
-          title: req.body.title,
-          note: req.body.note,
-          modified: Date.now()
+      console.log(req.body);
+      
+    db.workouts.insert(
+        // {
+        //   _id: mongojs.ObjectId(req.params.id)
+        // },
+        // {
+        //   $set: {
+        //     title: req.body.title,
+        //     note: req.body.note,
+        //     modified: Date.now()
+        //   }
+        // },
+        {exercises:[{
+            type:"benchpress",
+        }]},
+        (error, data) => {
+          if (error) {
+            res.send(error);
+          } else {
+            res.send(data);
+          }
         }
-      },
-      (error, data) => {
-        if (error) {
-          res.send(error);
-        } else {
-          res.send(data);
-        }
-      }
-    );
-  });
+      );
+    });
 }

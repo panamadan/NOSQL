@@ -1,4 +1,4 @@
-const workout = require("./workout");
+const workouts = require("./workout");
 module.exports={
-    workout:workout
+    workouts:workouts
 }
